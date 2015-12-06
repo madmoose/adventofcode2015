@@ -1,0 +1,370 @@
+==> day01a.go <==
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
+
+func main() {
+	floor := 0
+	r := bufio.NewReader(os.Stdin)
+	for {
+		c, _, err := r.ReadRune()
+		if err != nil {
+			break
+		}
+
+		switch c {
+		case '(':
+			floor++
+		case ')':
+			floor--
+		}
+	}
+
+	fmt.Println(floor)
+}
+==> day01b.go <==
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
+
+func main() {
+	floor := 0
+	pos := 1
+	r := bufio.NewReader(os.Stdin)
+
+	for ; ; pos++ {
+		c, _, err := r.ReadRune()
+		if err != nil {
+			break
+		}
+
+		switch c {
+		case '(':
+			floor++
+		case ')':
+			floor--
+		}
+
+		if floor < 0 {
+			break
+		}
+	}
+
+	fmt.Println(pos)
+}
+==> day02a.go <==
+package main
+
+import "fmt"
+
+func main() {
+	area := 0
+	for {
+		var l, w, h int
+		if n, _ := fmt.Scanf("%dx%dx%d\n", &l, &w, &h); n != 3 {
+			break
+		}
+
+		area += 2*l*w + 2*w*h + 2*l*h
+
+		if l*w < w*h && l*w < l*h {
+			area += l * w
+		} else if w*h < l*h {
+			area += w * h
+		} else {
+			area += l * h
+		}
+
+	}
+
+	fmt.Println(area)
+}
+==> day02b.go <==
+package main
+
+import "fmt"
+
+func main() {
+	ribbon := 0
+	for {
+		var l, w, h int
+		if n, _ := fmt.Scanf("%dx%dx%d\n", &l, &w, &h); n != 3 {
+			break
+		}
+
+		if l < h && w < h {
+			ribbon += l + l + w + w
+		} else if l < w {
+			ribbon += l + l + h + h
+		} else {
+			ribbon += w + w + h + h
+		}
+
+		ribbon += l * w * h
+
+	}
+
+	fmt.Println(ribbon)
+}
+==> day03a.go <==
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
+
+type sleigh struct {
+	x int
+	y int
+}
+
+func (s *sleigh) move(c rune) {
+	switch c {
+	case '^':
+		s.y--
+	case '>':
+		s.x++
+	case 'v':
+		s.y++
+	case '<':
+		s.x--
+	}
+}
+
+func main() {
+	var santa sleigh
+	var houses = make(map[sleigh]int)
+
+	houses[santa]++
+
+	r := bufio.NewReader(os.Stdin)
+	for {
+		c, _, err := r.ReadRune()
+		if err != nil {
+			break
+		}
+
+		santa.move(c)
+		houses[santa]++
+	}
+
+	fmt.Println(len(houses))
+}
+==> day03b.go <==
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
+
+type sleigh struct {
+	x int
+	y int
+}
+
+func (s *sleigh) move(c rune) {
+	switch c {
+	case '^':
+		s.y--
+	case '>':
+		s.x++
+	case 'v':
+		s.y++
+	case '<':
+		s.x--
+	}
+}
+
+func main() {
+	var (
+		houses  = make(map[sleigh]int)
+		sleighs = [2]sleigh{}
+		i       int
+		err     error
+	)
+
+	for i, _ = range sleighs {
+		houses[sleighs[i]]++
+	}
+
+	i = 0
+	r := bufio.NewReader(os.Stdin)
+	for {
+		var c rune
+		if c, _, err = r.ReadRune(); err != nil {
+			break
+		}
+
+		sleighs[i].move(c)
+		houses[sleighs[i]]++
+		i = (i + 1) % len(sleighs)
+	}
+
+	fmt.Println(len(houses))
+}
+==> day04a.go <==
+package main
+
+import (
+	"crypto/md5"
+	"fmt"
+	"strconv"
+)
+
+func main() {
+	i := 0
+	for ; ; i++ {
+		b := md5.Sum([]byte("iwrupvqb" + strconv.Itoa(i)))
+		if b[0] == 0 && b[1] == 0 && b[2]&0xf0 == 0 {
+			break
+		}
+	}
+
+	fmt.Println(i)
+}
+==> day04b.go <==
+package main
+
+import (
+	"crypto/md5"
+	"fmt"
+	"strconv"
+)
+
+func main() {
+	i := 0
+	for ; ; i++ {
+		b := md5.Sum([]byte("iwrupvqb" + strconv.Itoa(i)))
+		if b[0] == 0 && b[1] == 0 && b[2] == 0 {
+			break
+		}
+	}
+
+	fmt.Println(i)
+}
+==> day05a.go <==
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+)
+
+func hasThreeWovels(s string) bool {
+	n := 0
+	for _, r := range s {
+		if strings.ContainsRune("aeiou", r) {
+			n++
+		}
+	}
+
+	return n >= 3
+}
+
+func hasDoubleLetter(s string) bool {
+	for n := 1; n < len(s); n++ {
+		if s[n] == s[n-1] {
+			return true
+		}
+	}
+
+	return false
+}
+
+func hasNoBadCombinations(s string) bool {
+	bads := []string{
+		"ab",
+		"cd",
+		"pq",
+		"xy",
+	}
+
+	for _, b := range bads {
+		if strings.Contains(s, b) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func isNice(word string) bool {
+	return hasThreeWovels(word) &&
+		hasDoubleLetter(word) &&
+		hasNoBadCombinations(word)
+}
+
+func main() {
+	nice := 0
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		word := scanner.Text()
+		if isNice(word) {
+			nice++
+		}
+	}
+
+	fmt.Println(nice)
+}
+==> day05b.go <==
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
+
+func hasSplitPair(s string) bool {
+	for n := 2; n < len(s); n++ {
+		if s[n] == s[n-2] {
+			return true
+		}
+	}
+
+	return false
+}
+
+func hasRepeatedCouple(s string) bool {
+	for n := 3; n < len(s); n++ {
+		for m := 1; m < n-1; m++ {
+			if s[n] == s[m] && s[n-1] == s[m-1] {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func isNice(word string) bool {
+	return hasSplitPair(word) &&
+		hasRepeatedCouple(word)
+}
+
+func main() {
+	nice := 0
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		word := scanner.Text()
+		if isNice(word) {
+			nice++
+		}
+	}
+
+	fmt.Println(nice)
+}
